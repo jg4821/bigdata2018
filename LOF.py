@@ -24,20 +24,17 @@ class Lof():
 		distance = squareform(pdist(data))
 		indices = stats.mstats.rankdata(distance, axis=1)
 		indices_k = indices <= self.k
-		
 		# compute k distance of each point
 		kdist = np.zeros(len(data))
 		for i in range(data.shape[0]):
 			kneighbours = distance[i, indices_k[i, :]]
 			kdist[i] = kneighbours.max()
-
 		# compute the local reachability distance
 		lrd = np.zeros(len(data))
 		for i in range(data.shape[0]):
 			# reachability distance of k nearest points
 			# is the max of kdist of the point or the actual distance
 			lrd[i] = 1/np.maximum(kdist[indices_k[i, :]], distance[i, indices_k[i, :]]).mean()
-		
 		# compute lof
 		lof = np.zeros(len(data))
 		for i in range(data.shape[0]):
@@ -66,6 +63,16 @@ time = datetime.now()
 lof = model.fit(nonna)
 
 diff_time = (datetime.now()-time).total_seconds()
+
+# append columns of lof score and running time to the dataset
+nonna['lof'] = lof
+time_list = [diff_time] * nonna.shape[0]
+time_list = np.asarray(time_list)
+nonna['run_time(s)'] = time_list
+
+# write to csv file
+result = spark.createDataFrame(nonna)
+result.coalesce(1).write.format('csv').options(header='true').save('result.csv')
 
 
 sc.stop()
