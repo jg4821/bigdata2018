@@ -1,0 +1,16 @@
+1. Put the python file to dumbo:
+scp /path/ABOD.py NetID@dumbo.hpc.nyu.edu:/home/NetID
+
+2. Run pySpark on dumbo with the dataset for detecting outliers (the dataset has to be in the dumbo remote server):
+spark-submit ABOD.py /user/NetID/path/38ib-pjw5.csv
+
+3. Retrieve the result from remote dumbo to local dumbo:
+hfs -getmerge abod_result.csv abod_38ib.csv
+
+4.clear the remote dumbo memory:
+hfs -rm -r abod_result.csv
+
+5. Move the cleaned dataset from dumbo to local disk:
+scp NetID@dumbo.hpc.nyu.edu:/home/NetID/abod_38ib.csv .
+
+
